@@ -1,0 +1,76 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: nginx-ldap-auth
+data:
+  config.yaml: |
+    web: 0.0.0.0:5555
+    servers:
+    - ldaps://ldap1.example.com:636
+    - ldaps://ldap2.example.com:636
+    - ldaps://ldap3.example.com:636
+    auth:
+      bindDN: uid=seviceaccount,cn=users,dc=example,dc=com
+      bindPW: password
+    user:
+      bindDN: cn=users,dc=example,dc=com
+      filter: "(objectClass=person)"
+      username: uid
+      requiredGroups:
+      - appAdmin
+    group:
+      baseDN: cn=groups,dc=freeipa,dc=example,dc=com
+      filter: "(objectClass=group)"
+      userAttr: uid
+      groupAttr: member
+    timeout:
+      success: 24h
+      wrong: 5m
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-ldap-auth
+spec:
+  type: ClusterIP
+  ports:
+  - name: nginx-ldap-auth
+    port: 5555
+    protocol: TCP:
+    targetPort: 5555
+  selector:
+    app: nginx-ldap-auth
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: nginx-ldap-auth
+  labels:
+    app: nginx-ldap-auth
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-ldap-auth
+    spec:
+      containers:
+      - image: docker.io/tpimenta/nginx-ldap-auth:latest
+        name: nginx-ldap-auth
+        command:
+          - "nginx-ldap-auth"
+          - "--config"
+          - "/etc/nginx-ldap-auth/config.yaml"
+        ports:
+        - name: http
+          containerPort: 5555
+        volumeMounts:
+        - name: config
+          mountPath: /etc/nginx-ldap-auth
+      volumes:
+      - name: config
+        secret:
+          secretName: nginx-ldap-auth
+          items:
+          - key: config.yaml
+            path: config.yaml
