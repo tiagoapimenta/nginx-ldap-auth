@@ -17,7 +17,7 @@ type userpass struct {
 }
 
 var (
-	passwords map[string]userpass
+	passwords = map[string]*userpass{}
 	mutex     = sync.RWMutex{}
 )
 
@@ -28,7 +28,7 @@ func containsWrongPassword(data *userpass, password string) (int, bool) {
 	}
 
 	pos := sort.Search(size, func(i int) bool {
-		return data.wrong[i].password < password
+		return data.wrong[i].password >= password
 	})
 
 	return pos, pos < size &&
@@ -48,7 +48,7 @@ func getCache(username, password string) (bool, bool) {
 		return true, true
 	}
 
-	_, found = containsWrongPassword(&data, password)
+	_, found = containsWrongPassword(data, password)
 
 	return false, found
 }
@@ -59,28 +59,29 @@ func putCache(username, password string, ok bool) {
 
 	data, found := passwords[username]
 	if !found {
-		data = userpass{}
+		data = &userpass{}
 		passwords[username] = data
+	}
+
+	timeout := config.Timeout.Wrong
+	if ok {
+		timeout = config.Timeout.Success
+	}
+
+	pass := passtimer{
+		password: password,
+		timer: time.AfterFunc(timeout, func() {
+			removeCache(username, password, ok)
+		}),
 	}
 
 	if ok {
 		if data.correct != nil {
 			data.correct.timer.Stop()
 		}
-		data.correct = &passtimer{
-			password: password,
-			timer: time.AfterFunc(config.Timeout.Success, func() {
-				removeCache(username, "", true)
-			}),
-		}
+		data.correct = &pass
 	} else {
-		pass := passtimer{
-			password: password,
-			timer: time.AfterFunc(config.Timeout.Wrong, func() {
-				removeCache(username, password, false)
-			}),
-		}
-		pos, found := containsWrongPassword(&data, password)
+		pos, found := containsWrongPassword(data, password)
 		if found {
 			data.wrong[pos].timer.Stop()
 		} else {
@@ -106,7 +107,7 @@ func removeCache(username, password string, ok bool) {
 			data.correct = nil
 		}
 	} else {
-		pos, found := containsWrongPassword(&data, password)
+		pos, found := containsWrongPassword(data, password)
 		if found {
 			data.wrong[pos].timer.Stop()
 			data.wrong = data.wrong[:pos+copy(data.wrong[pos:], data.wrong[pos+1:])]

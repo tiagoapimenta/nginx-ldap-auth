@@ -9,8 +9,10 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-var configFile = flag.String("config", "/etc/nginx-ldap-auth/config.yaml", "Configuration file")
-var config Config
+var (
+	configFile = flag.String("config", "/etc/nginx-ldap-auth/config.yaml", "Configuration file")
+	config     Config
+)
 
 func main() {
 	flag.Parse()
