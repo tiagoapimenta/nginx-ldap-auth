@@ -13,9 +13,9 @@ data:
       bindDN: uid=seviceaccount,cn=users,dc=example,dc=com
       bindPW: password
     user:
-      bindDN: cn=users,dc=example,dc=com
+      baseDN: cn=users,dc=example,dc=com
       filter: "(objectClass=person)"
-      username: uid
+      userAttr: uid
       requiredGroups:
       - appAdmin
     group:

@@ -8,17 +8,17 @@ type AuthConfig struct {
 }
 
 type UserConfig struct {
-	BindDN         string   `yaml:"bindDN"`
+	BaseDN         string   `yaml:"baseDN"`
 	Filter         string   `yaml:"filter"`
 	UserAttr       string   `yaml:"userAttr"`
 	RequiredGroups []string `yaml:"requiredGroups"`
 }
 
 type GroupConfig struct {
-	BindDN    string `yaml:"bindDN"`
+	BaseDN    string `yaml:"baseDN"`
 	Filter    string `yaml:"filter"`
 	UserAttr  string `yaml:"userAttr"`
-	GroupAttr string `yaml:"member"`
+	GroupAttr string `yaml:"groupAttr"`
 }
 
 type TimeoutConfig struct {
