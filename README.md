@@ -1,6 +1,6 @@
 # Nginx LDAP Auth
 
-Use this in order to provide a ingress authentication over LDAP for Kubernetes, change the ConfigMap inside `k8s.yaml` to match your LDAP server and run:
+Use this in order to provide a ingress authentication over LDAP for Kubernetes, change the Secret inside `k8s.yaml` to match your LDAP server and run:
 
     kubectl apply -f k8s.yaml
 
