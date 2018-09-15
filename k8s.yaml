@@ -5,6 +5,7 @@ metadata:
 data:
   config.yaml: |
     web: 0.0.0.0:5555
+    path: /
     servers:
     - ldaps://ldap1.example.com:636
     - ldaps://ldap2.example.com:636

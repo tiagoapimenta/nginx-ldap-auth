@@ -28,6 +28,7 @@ type TimeoutConfig struct {
 
 type Config struct {
 	Web     string        `yaml:"web"`
+	Path    string        `yaml:"path"`
 	Servers []string      `yaml:"servers"`
 	Auth    AuthConfig    `yaml:"auth"`
 	User    UserConfig    `yaml:"user"`
