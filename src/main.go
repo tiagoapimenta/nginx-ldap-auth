@@ -16,8 +16,9 @@ import (
 var (
 	configFile = flag.String("config", "/etc/nginx-ldap-auth/config.yaml", "Configuration file")
 	config     = Config{
-		Web:  "0.0.0.0:5555",
-		Path: "/",
+		Web:     "0.0.0.0:5555",
+		Path:    "/",
+		Message: "LDAP Login",
 		User: UserConfig{
 			Filter: "(cn={0})",
 		},
@@ -84,7 +85,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("WWW-Authenticate", "Basic realm=\"LDAP Login\"")
+	w.Header().Set("WWW-Authenticate", fmt.Sprintf("Basic realm=\"%s\"", config.Message))
 	w.WriteHeader(http.StatusUnauthorized)
 }
 

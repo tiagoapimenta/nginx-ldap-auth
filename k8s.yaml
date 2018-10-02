@@ -6,20 +6,21 @@ data:
   config.yaml: |
     web: 0.0.0.0:5555
     path: /
+    message: "LDAP Login"
     servers:
     - ldaps://ldap1.example.com:636
     - ldaps://ldap2.example.com:636
     - ldaps://ldap3.example.com:636
     auth:
-      bindDN: uid=seviceaccount,cn=users,dc=example,dc=com
+      bindDN: cn=seviceaccount,cn=users,o=company
       bindPW: password
     user:
-      baseDN: ou=users,dc=example,dc=com
+      baseDN: ou=users,o=company
       filter: "(cn={0})"
       requiredGroups:
       - appAdmin
     group:
-      baseDN: ou=groups,dc=example,dc=com
+      baseDN: ou=groups,o=company
       groupAttr: cn
       filter: "(member={0})"
     timeout:
