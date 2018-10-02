@@ -2,22 +2,29 @@ package main
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"math/rand"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	ldap "gopkg.in/ldap.v2"
 )
 
-var conn *ldap.Conn
+var (
+	conn  *ldap.Conn
+	admin bool
+	lock  sync.Mutex
+)
 
 func setupLDAP() error {
 	size := len(config.Servers)
 	if size == 0 {
-		return fmt.Errorf("No LDAP server available on %+v", config)
+		return errors.New("No LDAP server available!")
 	}
 
 	r := rand.New(rand.NewSource(time.Now().Unix()))
@@ -79,22 +86,28 @@ func setupLDAP() error {
 		}
 	}
 
-	if config.Auth.BindDN != "" || config.Auth.BindPW != "" {
-		err = conn.Bind(config.Auth.BindDN, config.Auth.BindPW)
-		if err != nil {
-			return err
-		}
+	admin = false
+	return auth()
+}
+
+func auth() error {
+	if admin || config.Auth.BindDN == "" && config.Auth.BindPW == "" {
+		return nil
+	}
+	err := conn.Bind(config.Auth.BindDN, config.Auth.BindPW)
+	if err == nil {
+		admin = true
 	}
 	return nil
 }
 
 func ldapLogin(username, password string) (bool, error) {
-	// TODO: lock
-	if config.Auth.BindDN != "" || config.Auth.BindPW != "" {
-		err := conn.Bind(config.Auth.BindDN, config.Auth.BindPW)
-		if err != nil {
-			return false, err
-		}
+	lock.Lock()
+	defer lock.Unlock()
+
+	err := auth()
+	if err != nil {
+		return false, err
 	}
 
 	req := ldap.NewSearchRequest(
@@ -105,12 +118,11 @@ func ldapLogin(username, password string) (bool, error) {
 		0,
 		false,
 		strings.Replace(config.User.Filter, "{0}", username, -1),
-		[]string{config.User.UserAttr},
+		nil,
 		nil,
 	)
 
 	res, err := conn.Search(req)
-
 	if err != nil {
 		return false, err
 	}
@@ -119,6 +131,51 @@ func ldapLogin(username, password string) (bool, error) {
 		return false, nil
 	}
 
+	admin = false
 	err = conn.Bind(res.Entries[0].DN, password)
-	return err == nil, nil
+	if err != nil {
+		return false, nil
+	}
+
+	err = auth()
+	if err != nil {
+		return false, err
+	}
+
+	if len(config.User.RequiredGroups) == 0 {
+		return true, nil
+	}
+
+	req = ldap.NewSearchRequest(
+		config.Group.BaseDN,
+		ldap.ScopeWholeSubtree,
+		ldap.NeverDerefAliases,
+		0,
+		0,
+		false,
+		strings.Replace(config.Group.Filter, "{0}", res.Entries[0].DN, -1),
+		[]string{config.Group.GroupAttr},
+		nil,
+	)
+
+	res, err = conn.Search(req)
+	if err != nil {
+		return false, err
+	}
+
+	groups := []string{}
+	for _, entry := range res.Entries {
+		groups = append(groups, entry.GetAttributeValue(config.Group.GroupAttr))
+	}
+
+	sort.Strings(groups)
+
+	for _, group := range config.User.RequiredGroups {
+		pos := sort.SearchStrings(groups, group)
+		if pos >= len(groups) || groups[pos] != group {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }

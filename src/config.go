@@ -10,15 +10,13 @@ type AuthConfig struct {
 type UserConfig struct {
 	BaseDN         string   `yaml:"baseDN"`
 	Filter         string   `yaml:"filter"`
-	UserAttr       string   `yaml:"userAttr"`
 	RequiredGroups []string `yaml:"requiredGroups"`
 }
 
 type GroupConfig struct {
 	BaseDN    string `yaml:"baseDN"`
-	Filter    string `yaml:"filter"`
-	UserAttr  string `yaml:"userAttr"`
 	GroupAttr string `yaml:"groupAttr"`
+	Filter    string `yaml:"filter"`
 }
 
 type TimeoutConfig struct {

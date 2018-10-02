@@ -14,16 +14,14 @@ data:
       bindDN: uid=seviceaccount,cn=users,dc=example,dc=com
       bindPW: password
     user:
-      baseDN: cn=users,dc=example,dc=com
-      filter: "(objectClass=person)"
-      userAttr: uid
+      baseDN: ou=users,dc=example,dc=com
+      filter: "(cn={0})"
       requiredGroups:
       - appAdmin
     group:
-      baseDN: cn=groups,dc=freeipa,dc=example,dc=com
-      filter: "(objectClass=group)"
-      userAttr: uid
-      groupAttr: member
+      baseDN: ou=groups,dc=example,dc=com
+      groupAttr: cn
+      filter: "(member={0})"
     timeout:
       success: 24h
       wrong: 5m

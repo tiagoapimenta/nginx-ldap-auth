@@ -19,11 +19,11 @@ var (
 		Web:  "0.0.0.0:5555",
 		Path: "/",
 		User: UserConfig{
-			UserAttr: "uid",
+			Filter: "(cn={0})",
 		},
 		Group: GroupConfig{
-			UserAttr:  "uid",
-			GroupAttr: "member",
+			Filter:    "(member={0})",
+			GroupAttr: "cn",
 		},
 		Timeout: TimeoutConfig{
 			Success: 24 * time.Hour,
@@ -45,7 +45,7 @@ func main() {
 		log.Fatalf("Error on parse config: %v\n", err)
 	}
 
-	fmt.Printf("Loaded config: %+v\n", config)
+	fmt.Printf("Loaded config \"%s\".\n", *configFile)
 
 	err = setupLDAP()
 	if err != nil {
@@ -73,6 +73,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				secret := strings.SplitN(string(decoded), ":", 2)
 
 				if len(secret) == 2 && validate(secret[0], secret[1]) {
+					// TODO: match by header, e.g: X-Original-URL X-Original-Method X-Sent-From X-Auth-Request-Redirect
+
 					w.WriteHeader(http.StatusOK)
 					return
 				}
