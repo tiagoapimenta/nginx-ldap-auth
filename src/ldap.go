@@ -78,5 +78,47 @@ func setupLDAP() error {
 			return err
 		}
 	}
+
+	if config.Auth.BindDN != "" || config.Auth.BindPW != "" {
+		err = conn.Bind(config.Auth.BindDN, config.Auth.BindPW)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+func ldapLogin(username, password string) (bool, error) {
+	// TODO: lock
+	if config.Auth.BindDN != "" || config.Auth.BindPW != "" {
+		err := conn.Bind(config.Auth.BindDN, config.Auth.BindPW)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	req := ldap.NewSearchRequest(
+		config.User.BaseDN,
+		ldap.ScopeWholeSubtree,
+		ldap.NeverDerefAliases,
+		0,
+		0,
+		false,
+		strings.Replace(config.User.Filter, "{0}", username, -1),
+		[]string{config.User.UserAttr},
+		nil,
+	)
+
+	res, err := conn.Search(req)
+
+	if err != nil {
+		return false, err
+	}
+
+	if len(res.Entries) != 1 {
+		return false, nil
+	}
+
+	err = conn.Bind(res.Entries[0].DN, password)
+	return err == nil, nil
 }
