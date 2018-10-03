@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+image='docker.io/tpimenta/nginx-ldap-auth:latest'
+
+atexit() {
+	docker images -q -f dangling=true | xargs -r docker rmi
+}
+
+trap atexit INT TERM EXIT
+
+docker build \
+	--force-rm \
+	--no-cache \
+	--tag "$image" \
+	"$(dirname "$0")"
+
+docker push "$image"
