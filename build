@@ -2,7 +2,9 @@
 
 set -e
 
-image='docker.io/tpimenta/nginx-ldap-auth:latest'
+base='docker.io/tpimenta/nginx-ldap-auth'
+version='v1.0.0'
+image="$base:$version"
 
 atexit() {
 	docker images -q -f dangling=true | xargs -r docker rmi
@@ -17,3 +19,5 @@ docker build \
 	"$(dirname "$0")"
 
 docker push "$image"
+docker tag "$image" "$base:latest"
+docker push "$base:latest"

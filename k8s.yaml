@@ -55,7 +55,7 @@ spec:
         app: nginx-ldap-auth
     spec:
       containers:
-      - image: docker.io/tpimenta/nginx-ldap-auth:latest
+      - image: docker.io/tpimenta/nginx-ldap-auth:v1.0.0
         name: nginx-ldap-auth
         command:
           - "nginx-ldap-auth"
