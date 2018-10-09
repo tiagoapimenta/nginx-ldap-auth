@@ -3,7 +3,7 @@
 set -e
 
 base='docker.io/tpimenta/nginx-ldap-auth'
-version='v1.0.0'
+version='v1.0.1'
 image="$base:$version"
 
 atexit() {

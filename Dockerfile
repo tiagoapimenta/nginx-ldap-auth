@@ -1,12 +1,12 @@
 FROM golang:alpine
 
-COPY src /go/src/github.com/tiagoapimenta/nginx-ldap-auth
+COPY . /go/src/github.com/tiagoapimenta/nginx-ldap-auth
 
 RUN cd /go/src/github.com/tiagoapimenta/nginx-ldap-auth && \
 	apk add --no-cache git && \
 	go get -u gopkg.in/yaml.v2 && \
 	go get -u gopkg.in/ldap.v2 && \
-	go build -ldflags='-s -w' -v -o /go/bin/nginx-ldap-auth .
+	go build -ldflags='-s -w' -v -o /go/bin/nginx-ldap-auth ./main
 
 FROM alpine
 

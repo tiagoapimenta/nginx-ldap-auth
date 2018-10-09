@@ -1,4 +1,4 @@
-package main
+package data
 
 import (
 	"sort"
@@ -16,30 +16,27 @@ type userpass struct {
 	wrong   []passtimer
 }
 
-var (
-	passwords = map[string]*userpass{}
-	mutex     = sync.RWMutex{}
-)
-
-func containsWrongPassword(data *userpass, password string) (int, bool) {
-	size := len(data.wrong)
-	if size == 0 {
-		return 0, false
-	}
-
-	pos := sort.Search(size, func(i int) bool {
-		return data.wrong[i].password >= password
-	})
-
-	return pos, pos < size &&
-		data.wrong[pos].password == password
+type Storage struct {
+	passwords map[string]*userpass
+	lock      sync.RWMutex
+	success   time.Duration
+	wrong     time.Duration
 }
 
-func getCache(username, password string) (bool, bool) {
-	defer mutex.RUnlock()
-	mutex.RLock()
+func NewStorage(success, wrong time.Duration) *Storage {
+	return &Storage{
+		passwords: map[string]*userpass{},
+		lock:      sync.RWMutex{},
+		success:   success,
+		wrong:     wrong,
+	}
+}
 
-	data, found := passwords[username]
+func (p *Storage) Get(username, password string) (bool, bool) {
+	p.lock.RLock()
+	defer p.lock.RUnlock()
+
+	data, found := p.passwords[username]
 	if !found {
 		return false, false
 	}
@@ -53,25 +50,25 @@ func getCache(username, password string) (bool, bool) {
 	return false, found
 }
 
-func putCache(username, password string, ok bool) {
-	defer mutex.Unlock()
-	mutex.Lock()
+func (p *Storage) Put(username, password string, ok bool) {
+	p.lock.Lock()
+	defer p.lock.Unlock()
 
-	data, found := passwords[username]
+	data, found := p.passwords[username]
 	if !found {
 		data = &userpass{}
-		passwords[username] = data
+		p.passwords[username] = data
 	}
 
-	timeout := config.Timeout.Wrong
+	timeout := p.wrong
 	if ok {
-		timeout = config.Timeout.Success
+		timeout = p.success
 	}
 
 	pass := passtimer{
 		password: password,
 		timer: time.AfterFunc(timeout, func() {
-			removeCache(username, password, ok)
+			p.remove(username, password, ok)
 		}),
 	}
 
@@ -92,11 +89,11 @@ func putCache(username, password string, ok bool) {
 	}
 }
 
-func removeCache(username, password string, ok bool) {
-	defer mutex.Unlock()
-	mutex.Lock()
+func (p *Storage) remove(username, password string, ok bool) {
+	p.lock.Lock()
+	defer p.lock.Unlock()
 
-	data, found := passwords[username]
+	data, found := p.passwords[username]
 	if !found {
 		return
 	}
@@ -115,6 +112,20 @@ func removeCache(username, password string, ok bool) {
 	}
 
 	if data.correct == nil && len(data.wrong) == 0 {
-		delete(passwords, username)
+		delete(p.passwords, username)
 	}
+}
+
+func containsWrongPassword(data *userpass, password string) (int, bool) {
+	size := len(data.wrong)
+	if size == 0 {
+		return 0, false
+	}
+
+	pos := sort.Search(size, func(i int) bool {
+		return data.wrong[i].password >= password
+	})
+
+	return pos, pos < size &&
+		data.wrong[pos].password == password
 }
