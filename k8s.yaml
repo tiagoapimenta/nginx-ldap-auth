@@ -1,32 +1,3 @@
-kind: Secret
-apiVersion: v1
-metadata:
-  name: nginx-ldap-auth
-data:
-  config.yaml: |
-    web: 0.0.0.0:5555
-    path: /
-    message: "LDAP Login"
-    servers:
-    - ldaps://ldap1.example.com:636
-    - ldaps://ldap2.example.com:636
-    - ldaps://ldap3.example.com:636
-    auth:
-      bindDN: cn=seviceaccount,cn=users,o=company
-      bindPW: password
-    user:
-      baseDN: ou=users,o=company
-      filter: "(cn={0})"
-      requiredGroups:
-      - appAdmin
-    group:
-      baseDN: ou=groups,o=company
-      groupAttr: cn
-      filter: "(member={0})"
-    timeout:
-      success: 24h
-      wrong: 5m
----
 kind: Service
 apiVersion: v1
 metadata:
@@ -36,7 +7,7 @@ spec:
   ports:
   - name: nginx-ldap-auth
     port: 5555
-    protocol: TCP:
+    protocol: TCP
     targetPort: 5555
   selector:
     app: nginx-ldap-auth

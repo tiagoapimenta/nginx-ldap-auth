@@ -1,0 +1,21 @@
+web: 0.0.0.0:5555
+path: /
+servers:
+- ldaps://ldap1.example.com:636
+- ldaps://ldap2.example.com:636
+- ldaps://ldap3.example.com:636
+auth:
+  bindDN: uid=seviceaccount,cn=users,dc=example,dc=com
+  bindPW: password
+user:
+  baseDN: ou=users,dc=example,dc=com
+  filter: "(cn={0})"
+  requiredGroups:
+  - appAdmin
+group:
+  baseDN: ou=groups,dc=example,dc=com
+  groupAttr: cn
+  filter: "(member={0})"
+timeout:
+  success: 24h
+  wrong: 5m
