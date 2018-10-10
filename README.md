@@ -6,6 +6,10 @@ Use this in order to provide a ingress authentication over LDAP for Kubernetes, 
 
     kubectl apply -f k8s.yaml
 
+For RBAC enabled cluster use the k8s-rbac.yaml manifest instead:
+
+    kubectl apply -f k8s-rbac.yaml
+
 Configure your ingress with annotation `nginx.ingress.kubernetes.io/auth-url: http://nginx-ldap-auth.default.svc.cluster.local:5555` as described on [nginx documentation](https://kubernetes.github.io/ingress-nginx/examples/auth/external-auth/).
 
 ## Config
