@@ -55,7 +55,7 @@ func (p *Service) validate(username, password string) (bool, error) {
 	}
 
 	if ok || p.required == nil || len(p.required) == 0 {
-		return err != nil, nil
+		return err == nil, nil
 	}
 
 	groups, err := p.group.Find(id)
