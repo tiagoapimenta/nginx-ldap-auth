@@ -23,12 +23,13 @@ func parseConfig() (string, *Config, error) {
 		Web:     "0.0.0.0:5555",
 		Path:    "/",
 		Message: "LDAP Login",
-		User: UserConfig{
+               User: SearchConfig{
 			Filter: "(cn={0})",
+                       Attr:   "cn",
 		},
-		Group: GroupConfig{
-			Filter:    "(member={0})",
-			GroupAttr: "cn",
+               Group: SearchConfig{
+                       Filter: "(member={0})",
+                       Attr:   "cn",
 		},
 		Timeout: TimeoutConfig{
 			Success: 24 * time.Hour,

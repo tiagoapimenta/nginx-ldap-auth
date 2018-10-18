@@ -7,21 +7,33 @@ type AuthConfig struct {
 	BindPW string `yaml:"bindPW"`
 }
 
-type UserConfig struct {
-	BaseDN         string   `yaml:"baseDN"`
-	Filter         string   `yaml:"filter"`
-	RequiredGroups []string `yaml:"requiredGroups"`
-}
-
-type GroupConfig struct {
-	BaseDN    string `yaml:"baseDN"`
-	GroupAttr string `yaml:"groupAttr"`
-	Filter    string `yaml:"filter"`
+type SearchConfig struct {
+	BaseDN string `yaml:"baseDN"`
+	Filter string `yaml:"filter"`
+	Attr   string `yaml:"attr"`
 }
 
 type TimeoutConfig struct {
 	Success time.Duration `yaml:"success"`
 	Wrong   time.Duration `yaml:"wrong"`
+}
+
+type MatchConfig struct {
+	Header string `yaml:"header"`
+	Value  string `yaml:"value"`
+	Regex  string `yaml:"regex"`
+}
+
+type PermissionConfig struct {
+	Group string `yaml:"group"`
+	User  string `yaml:"user"`
+}
+
+type RulesConfig struct {
+	Match          []MatchConfig      `yaml:"match"`
+	Allow          []PermissionConfig `yaml:"allow"`
+	Deny           []PermissionConfig `yaml:"deny"`
+	AllowAnonymous bool               `yaml:"allowAnonymous"`
 }
 
 type Config struct {
@@ -30,7 +42,8 @@ type Config struct {
 	Message string        `yaml:"message"`
 	Servers []string      `yaml:"servers"`
 	Auth    AuthConfig    `yaml:"auth"`
-	User    UserConfig    `yaml:"user"`
-	Group   GroupConfig   `yaml:"group"`
+	User    SearchConfig  `yaml:"user"`
+	Group   SearchConfig  `yaml:"group"`
 	Timeout TimeoutConfig `yaml:"timeout"`
+	Rules   []RulesConfig `yaml:"rules"`
 }
