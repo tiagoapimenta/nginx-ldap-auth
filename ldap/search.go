@@ -21,22 +21,27 @@ func (p *Pool) Search(base, filter string, attr string) (bool, string, []string,
 		list = []string{attr}
 	}
 
-	res, err := p.conn.Search(ldap.NewSearchRequest(
-		base,
-		ldap.ScopeWholeSubtree,
-		ldap.NeverDerefAliases,
-		0,
-		0,
-		false,
-		filter,
-		list,
-		nil,
-	))
+	var res *ldap.SearchResult
+	err = p.networkJail(func() error {
+		res, err = p.conn.Search(ldap.NewSearchRequest(
+			base,
+			ldap.ScopeWholeSubtree,
+			ldap.NeverDerefAliases,
+			0,
+			0,
+			false,
+			filter,
+			list,
+			nil,
+		))
+		return err
+	})
+
 	if err != nil {
 		return false, "", nil, err
 	}
 
-	if len(res.Entries) == 0 {
+	if res == nil || len(res.Entries) == 0 {
 		return true, "", nil, fmt.Errorf("No results for %s filter %s", base, filter)
 	}
 

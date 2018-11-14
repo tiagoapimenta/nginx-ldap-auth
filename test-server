@@ -1,0 +1,44 @@
+#!/bin/sh
+
+set -e
+
+for name in ldap-test-server ldap-test-client; do
+	if docker ps -a --format '{{.Names}}' | egrep -q "^${name}\$"; then
+		docker rm -f "$name" || :
+	fi
+done
+
+docker run \
+	-p 389:389 \
+	-p 636:636 \
+	--name ldap-test-server \
+	-d \
+	osixia/openldap:1.2.2
+
+# docker exec ldap-test-server ldapsearch -x -H ldap://localhost -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin
+
+cat > /tmp/config.yaml <<EOF
+web: 0.0.0.0:5555
+path: /
+servers:
+- ldap://$(hostname -I | cut -d\  -f1)
+auth:
+  bindDN: cn=admin,dc=example,dc=org
+  bindPW: admin
+user:
+  baseDN: dc=example,dc=org
+  filter: "(cn={0})"
+EOF
+
+while ! nc -z -w5 127.0.0.1 389; do
+	sleep 1
+done
+
+sleep 2
+
+docker run \
+	-p 5555:5555 \
+	-v '/tmp/config.yaml:/etc/nginx-ldap-auth/config.yaml:ro' \
+	--name ldap-test-client \
+	-d \
+	docker.io/tpimenta/nginx-ldap-auth:v1.0.3

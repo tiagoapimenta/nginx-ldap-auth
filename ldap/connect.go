@@ -19,7 +19,7 @@ func (p *Pool) Connect() error {
 	}
 
 	if p.conn != nil {
-		return nil
+		p.conn.Close()
 	}
 
 	address := fmt.Sprintf("%s:%d", p.url, p.port)
@@ -37,6 +37,11 @@ func (p *Pool) Connect() error {
 		err = conn.StartTLS(&tls.Config{InsecureSkipVerify: true})
 		if err != nil {
 			log.Printf("It was not possble to start TLS, falling back to plain: %v.\n", err)
+			conn.Close()
+			conn, err = ldap.Dial("tcp", address)
+			if err != nil {
+				return err
+			}
 		}
 		p.conn = conn
 	}

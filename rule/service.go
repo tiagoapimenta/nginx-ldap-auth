@@ -33,7 +33,7 @@ func (p *Service) Validate(username, password string) bool {
 
 	ok, err := p.validate(username, password)
 	if err != nil {
-		log.Printf("Could not validade user %s: %v\n", username, err)
+		log.Printf("Could not validate user %s: %v\n", username, err)
 		return false
 	}
 
