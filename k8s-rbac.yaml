@@ -1,9 +1,7 @@
----
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: nginx-ldap-auth
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
@@ -26,7 +24,6 @@ rules:
       - "nginx-ldap-auth"
     verbs:
       - get
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
@@ -39,7 +36,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: nginx-ldap-auth
-
 ---
 kind: Service
 apiVersion: v1
@@ -54,7 +50,6 @@ spec:
     targetPort: 5555
   selector:
     app: nginx-ldap-auth
-
 ---
 kind: Deployment
 apiVersion: extensions/v1beta1
@@ -71,7 +66,7 @@ spec:
     spec:
       serviceAccountName: nginx-ldap-auth 
       containers:
-      - image: docker.io/tpimenta/nginx-ldap-auth:v1.0.2
+      - image: docker.io/tpimenta/nginx-ldap-auth:v1.0.3
         name: nginx-ldap-auth
         command:
           - "nginx-ldap-auth"
