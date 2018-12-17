@@ -41,4 +41,4 @@ docker run \
 	-v '/tmp/config.yaml:/etc/nginx-ldap-auth/config.yaml:ro' \
 	--name ldap-test-client \
 	-d \
-	docker.io/tpimenta/nginx-ldap-auth:v1.0.3
+	docker.io/tpimenta/nginx-ldap-auth:v1.0.4

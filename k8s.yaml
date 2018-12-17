@@ -26,12 +26,12 @@ spec:
         app: nginx-ldap-auth
     spec:
       containers:
-      - image: docker.io/tpimenta/nginx-ldap-auth:v1.0.3
+      - image: docker.io/tpimenta/nginx-ldap-auth:v1.0.4
         name: nginx-ldap-auth
         command:
-          - "nginx-ldap-auth"
-          - "--config"
-          - "/etc/nginx-ldap-auth/config.yaml"
+        - "/usr/local/bin/nginx-ldap-auth"
+        - "--config"
+        - "/etc/nginx-ldap-auth/config.yaml"
         ports:
         - name: http
           containerPort: 5555
