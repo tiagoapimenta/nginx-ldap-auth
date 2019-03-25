@@ -14,7 +14,7 @@ func (p *Pool) Validate(username, password string) (bool, error) {
 		return p.conn.Bind(username, password)
 	})
 	if err != nil {
-		return true, err
+		return false, err
 	}
 
 	err = p.auth()
