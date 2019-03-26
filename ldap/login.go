@@ -10,9 +10,13 @@ func (p *Pool) Validate(username, password string) (bool, error) {
 	}
 
 	p.admin = false
-	err = p.networkJail(func() error {
+	var ok bool
+	ok, err = p.networkJail(func() error {
 		return p.conn.Bind(username, password)
 	})
+	if !ok {
+		return false, err
+	}
 	if err != nil {
 		return true, err
 	}
@@ -30,7 +34,7 @@ func (p *Pool) auth() error {
 		return nil
 	}
 
-	err := p.networkJail(func() error {
+	_, err := p.networkJail(func() error {
 		return p.conn.Bind(p.username, p.password)
 	})
 	if err == nil {

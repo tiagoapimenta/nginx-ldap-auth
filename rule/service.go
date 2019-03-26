@@ -54,7 +54,7 @@ func (p *Service) validate(username, password string) (bool, error) {
 		return false, err
 	}
 
-	if !ok || p.required == nil || len(p.required) == 0 {
+	if !ok || err != nil || p.required == nil || len(p.required) == 0 {
 		return err == nil, nil
 	}
 

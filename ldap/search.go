@@ -22,7 +22,7 @@ func (p *Pool) Search(base, filter string, attr string) (bool, string, []string,
 	}
 
 	var res *ldap.SearchResult
-	err = p.networkJail(func() error {
+	_, err = p.networkJail(func() error {
 		res, err = p.conn.Search(ldap.NewSearchRequest(
 			base,
 			ldap.ScopeWholeSubtree,
