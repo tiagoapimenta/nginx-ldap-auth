@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/tiagoapimenta/nginx-ldap-auth/ldap"
+
+	gldap "gopkg.in/ldap.v2"
 )
 
 type Service struct {
@@ -23,6 +25,8 @@ func NewService(pool *ldap.Pool, base, filter, attr string) *Service {
 }
 
 func (p *Service) Find(id string) ([]string, error) {
+	id = gldap.EscapeFilter(id)
+
 	ok, _, groups, err := p.pool.Search(
 		p.base,
 		strings.Replace(p.filter, "{0}", id, -1),
