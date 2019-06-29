@@ -24,4 +24,8 @@ EXPOSE 5555
 
 USER 65534:65534
 
-CMD [ "/usr/local/bin/nginx-ldap-auth", "--config", "/etc/nginx-ldap-auth/config.yaml" ]
+CMD [ \
+	"/usr/local/bin/nginx-ldap-auth", \
+	"--config", \
+	"/etc/nginx-ldap-auth/config.yaml" \
+]
