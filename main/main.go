@@ -32,7 +32,7 @@ func main() {
 
 	groupService := group.NewService(pool, config.Group.BaseDN, config.Group.Filter, config.Group.GroupAttr)
 
-	ruleService := rule.NewService(storage, userService, groupService, config.User.RequiredGroups)
+	ruleService := rule.NewService(storage, userService, groupService, config.User.RequiredGroups, config.Group.SearchUsername)
 
 	fmt.Printf("Serving...\n")
 	err = startServer(ruleService, config.Web, config.Path, config.Message)

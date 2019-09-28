@@ -14,9 +14,10 @@ type UserConfig struct {
 }
 
 type GroupConfig struct {
-	BaseDN    string `yaml:"baseDN"`
-	GroupAttr string `yaml:"groupAttr"`
-	Filter    string `yaml:"filter"`
+	BaseDN         string `yaml:"baseDN"`
+	GroupAttr      string `yaml:"groupAttr"`
+	Filter         string `yaml:"filter"`
+	SearchUsername bool   `yaml:"searchUsername"`
 }
 
 type TimeoutConfig struct {

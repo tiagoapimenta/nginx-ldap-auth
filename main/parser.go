@@ -27,8 +27,9 @@ func parseConfig() (string, *Config, error) {
 			Filter: "(cn={0})",
 		},
 		Group: GroupConfig{
-			Filter:    "(member={0})",
-			GroupAttr: "cn",
+			Filter:         "(member={0})",
+			GroupAttr:      "cn",
+			SearchUsername: false,
 		},
 		Timeout: TimeoutConfig{
 			Success: 24 * time.Hour,

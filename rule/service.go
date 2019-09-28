@@ -10,18 +10,20 @@ import (
 )
 
 type Service struct {
-	storage  *data.Storage
-	user     *user.Service
-	group    *group.Service
-	required []string
+	storage        *data.Storage
+	user           *user.Service
+	group          *group.Service
+	required       []string
+	searchUsername bool
 }
 
-func NewService(storage *data.Storage, userService *user.Service, groupService *group.Service, required []string) *Service {
+func NewService(storage *data.Storage, userService *user.Service, groupService *group.Service, required []string, searchUsername bool) *Service {
 	return &Service{
-		storage:  storage,
-		user:     userService,
-		group:    groupService,
-		required: required,
+		storage:        storage,
+		user:           userService,
+		group:          groupService,
+		required:       required,
+		searchUsername: searchUsername,
 	}
 }
 
@@ -57,8 +59,11 @@ func (p *Service) validate(username, password string) (bool, error) {
 	if !ok || err != nil || p.required == nil || len(p.required) == 0 {
 		return err == nil, nil
 	}
-
-	groups, err := p.group.Find(id)
+	userSearch := id
+	if p.searchUsername {
+		userSearch = username
+	}
+	groups, err := p.group.Find(userSearch)
 	if err != nil {
 		return false, err
 	}
