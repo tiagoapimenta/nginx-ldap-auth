@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	ldap "gopkg.in/ldap.v2"
+	ldap "github.com/go-ldap/ldap/v3"
 )
 
 func (p *Pool) Connect() error {
