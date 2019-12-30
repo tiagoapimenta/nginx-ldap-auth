@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	ldap "gopkg.in/ldap.v2"
+	ldap "github.com/go-ldap/ldap/v3"
 )
 
 func (p *Pool) Search(base, filter string, attr string) (bool, string, []string, error) {

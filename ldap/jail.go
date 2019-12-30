@@ -3,7 +3,7 @@ package ldap
 import (
 	"log"
 
-	ldap "gopkg.in/ldap.v2"
+	ldap "github.com/go-ldap/ldap/v3"
 )
 
 func (p *Pool) networkJail(f func() error) (bool, error) {
