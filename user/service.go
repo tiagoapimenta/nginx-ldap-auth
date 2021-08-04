@@ -5,7 +5,7 @@ import (
 
 	"github.com/tiagoapimenta/nginx-ldap-auth/ldap"
 
-	gldap "gopkg.in/ldap.v2"
+	gldap "github.com/go-ldap/ldap/v3"
 )
 
 type Service struct {

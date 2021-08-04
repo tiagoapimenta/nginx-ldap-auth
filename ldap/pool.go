@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	ldap "gopkg.in/ldap.v2"
+	ldap "github.com/go-ldap/ldap/v3"
 )
 
 type Pool struct {

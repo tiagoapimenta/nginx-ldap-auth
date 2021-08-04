@@ -1,20 +1,18 @@
-FROM golang:alpine
+FROM golang:1.13-alpine AS gobuild
 
-COPY . /go/src/github.com/tiagoapimenta/nginx-ldap-auth
+COPY . /build/nginx-ldap-auth
 
 ENV CGO_ENABLED=0
 
-RUN cd /go/src/github.com/tiagoapimenta/nginx-ldap-auth && \
+RUN cd /build/nginx-ldap-auth && \
 	apk add --no-cache git && \
-	go get -u gopkg.in/yaml.v2 && \
-	go get -u gopkg.in/ldap.v2 && \
 	go build -a -x -ldflags='-s -w -extldflags -static' -v -o /go/bin/nginx-ldap-auth ./main
 
 FROM scratch
 
 MAINTAINER Tiago A. Pimenta <tiagoapimenta@gmail.com>
 
-COPY --from=0 /go/bin/nginx-ldap-auth /usr/local/bin/nginx-ldap-auth
+COPY --from=gobuild /go/bin/nginx-ldap-auth /usr/local/bin/nginx-ldap-auth
 
 WORKDIR /tmp
 
