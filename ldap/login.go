@@ -29,7 +29,7 @@ func (p *Pool) Validate(username, password string) (bool, error) {
 	}
 
 	if len(password) == 0 {
-		return false, errors.New("Password field cannot be empty")
+		return true, errors.New("Password field cannot be empty")
 	}
 
 	return true, nil
