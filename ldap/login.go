@@ -1,5 +1,7 @@
 package ldap
 
+import "errors"
+
 func (p *Pool) Validate(username, password string) (bool, error) {
 	p.lock.Lock()
 	defer p.lock.Unlock()
@@ -24,6 +26,10 @@ func (p *Pool) Validate(username, password string) (bool, error) {
 	err = p.auth()
 	if err != nil {
 		return false, err
+	}
+
+	if len(password) == 0 {
+		return true, errors.New("Password field cannot be empty")
 	}
 
 	return true, nil
