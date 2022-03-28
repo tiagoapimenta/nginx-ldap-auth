@@ -67,7 +67,7 @@ spec:
     spec:
       serviceAccountName: nginx-ldap-auth
       containers:
-      - image: docker.io/tpimenta/nginx-ldap-auth:v1.0.6
+      - image: docker.io/tpimenta/nginx-ldap-auth:v1.0.7
         name: nginx-ldap-auth
         command:
         - "/usr/local/bin/nginx-ldap-auth"
