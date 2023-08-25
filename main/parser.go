@@ -16,7 +16,7 @@ func parseConfig() (string, *Config, error) {
 
 	data, err := ioutil.ReadFile(*file)
 	if err != nil {
-		return "", nil, fmt.Errorf("Error on read file \"%s\": %v", *file, err)
+		return "", nil, fmt.Errorf("error on read file \"%s\": %v", *file, err)
 	}
 
 	config := Config{
@@ -31,8 +31,9 @@ func parseConfig() (string, *Config, error) {
 			GroupAttr: "cn",
 		},
 		Timeout: TimeoutConfig{
-			Success: 24 * time.Hour,
-			Wrong:   5 * time.Minute,
+			Success:     24 * time.Hour,
+			Wrong:       5 * time.Minute,
+			MaxAttempts: 0,
 		},
 	}
 

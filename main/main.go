@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("Error on connect to LDAP: %v\n", err)
 	}
 
-	storage := data.NewStorage(config.Timeout.Success, config.Timeout.Wrong)
+	storage := data.NewStorage(config.Timeout.Success, config.Timeout.Wrong, config.Timeout.MaxAttempts)
 
 	userService := user.NewService(pool, config.User.BaseDN, config.User.Filter)
 

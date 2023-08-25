@@ -17,18 +17,20 @@ type userpass struct {
 }
 
 type Storage struct {
-	passwords map[string]*userpass
-	lock      sync.RWMutex
-	success   time.Duration
-	wrong     time.Duration
+	passwords   map[string]*userpass
+	lock        sync.RWMutex
+	success     time.Duration
+	wrong       time.Duration
+	maxAttempts int
 }
 
-func NewStorage(success, wrong time.Duration) *Storage {
+func NewStorage(success, wrong time.Duration, attempts int) *Storage {
 	return &Storage{
-		passwords: map[string]*userpass{},
-		lock:      sync.RWMutex{},
-		success:   success,
-		wrong:     wrong,
+		passwords:   map[string]*userpass{},
+		lock:        sync.RWMutex{},
+		success:     success,
+		wrong:       wrong,
+		maxAttempts: attempts,
 	}
 }
 
@@ -39,6 +41,10 @@ func (p *Storage) Get(username, password string) (bool, bool) {
 	data, found := p.passwords[username]
 	if !found {
 		return false, false
+	}
+
+	if p.maxAttempts > 0 && len(data.wrong) >= p.maxAttempts {
+		return false, true
 	}
 
 	if data.correct != nil && (*data.correct).password == password {
