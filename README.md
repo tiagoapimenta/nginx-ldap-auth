@@ -23,3 +23,5 @@ If you are not sure what `filter`, `bindDN` or `baseDN` to use, here is a tip:
 Replace the values between `${...}` to the ones on `config.yaml`, when you succeed you can fill the final configuration.
 
 Timeouts are configurable, but it is recommended not to use values less than some seconds, it was planned to prevent several identical requests to LDAP servers.
+
+Password bruteforce prevention added - you can limit amount of attempts by using `timeout.maxAttempts` config. Value above zero limits attempts for different passwords, timeout is equal to `timeout.wrong` of first bad password attempt.

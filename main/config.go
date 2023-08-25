@@ -20,8 +20,9 @@ type GroupConfig struct {
 }
 
 type TimeoutConfig struct {
-	Success time.Duration `yaml:"success"`
-	Wrong   time.Duration `yaml:"wrong"`
+	Success     time.Duration `yaml:"success"`
+	Wrong       time.Duration `yaml:"wrong"`
+	MaxAttempts int           `yaml:"maxAttempts"`
 }
 
 type Config struct {

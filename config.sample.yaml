@@ -19,3 +19,4 @@ group:
 timeout:
   success: 24h
   wrong: 5m
+  maxAttempts: 0

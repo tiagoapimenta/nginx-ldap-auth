@@ -13,6 +13,8 @@ const (
 	password1 = "master"
 	password2 = "shadow"
 	password3 = "qwerty"
+	password4 = "sadfasr"
+	password5 = "someahjhtw"
 	success   = time.Second / 2
 	wrong     = time.Second / 5
 )
@@ -30,7 +32,7 @@ func printPassMap(t *testing.T, storage *Storage, prefix string) {
 		if v.correct != nil {
 			correct = v.correct.password
 		}
-		fmt.Fprintf(&buffer, "%s:{correct:%s,wrong:%+v}", k, correct, v.wrong)
+		_, _ = fmt.Fprintf(&buffer, "%s:{correct:%s,wrong:%+v}", k, correct, v.wrong)
 	}
 	t.Logf("%s passwords: %s\n", prefix, buffer.String())
 }
@@ -43,7 +45,7 @@ func testCache(t *testing.T, storage *Storage, id int, username, password string
 }
 
 func TestPasswordTimeout(t *testing.T) {
-	storage := NewStorage(success, wrong)
+	storage := NewStorage(success, wrong, 0)
 
 	testCache(t, storage, 0, username1, password1, false, false)
 	testCache(t, storage, 1, username1, password2, false, false)
@@ -82,4 +84,34 @@ func TestPasswordTimeout(t *testing.T) {
 	testCache(t, storage, 21, username2, password1, false, false)
 	testCache(t, storage, 22, username2, password2, false, false)
 	testCache(t, storage, 23, username2, password3, false, false)
+}
+
+func TestUserLock(t *testing.T) {
+	storage := NewStorage(success, wrong, 3)
+
+	testCache(t, storage, 1, username1, password3, false, false)
+	testCache(t, storage, 2, username1, password2, false, false)
+	testCache(t, storage, 3, username1, password2, false, false)
+	testCache(t, storage, 4, username1, password1, false, false)
+	testCache(t, storage, 5, username2, password2, false, false)
+
+	storage.Put(username1, password1, true)
+	storage.Put(username1, password3, false)
+	storage.Put(username1, password4, false)
+	storage.Put(username1, password5, false)
+	printPassMap(t, storage, "add")
+
+	testCache(t, storage, 6, username1, password3, false, true)
+	testCache(t, storage, 7, username1, password2, false, true)
+	testCache(t, storage, 8, username1, password2, false, true)
+	testCache(t, storage, 9, username1, password1, false, true)
+	testCache(t, storage, 10, username2, password2, false, false)
+
+	time.Sleep(wrong + wrong/2)
+	printPassMap(t, storage, "timed")
+
+	testCache(t, storage, 11, username1, password2, false, false)
+	testCache(t, storage, 12, username1, password1, true, true)
+	testCache(t, storage, 13, username1, password3, false, false)
+	testCache(t, storage, 14, username2, password3, false, false)
 }
